@@ -2,6 +2,7 @@ local playerHealth = 100
 local lastHitTime = {}
 local healthState = "normal"
 local stateEndTime = 0
+local timerPrinted = false
 
 local function GetBoneZone(boneId)
     for _, headBone in ipairs(Config.BoneZones.head) do
@@ -88,12 +89,16 @@ local function UpdateHealthState(damage)
             if healthState ~= stateName then
                 healthState = stateName
                 stateEndTime = GetGameTimer() + stateConfig.duration
-                print("ETAT: " .. stateConfig.message)
+                timerPrinted = false
+                print("ENTREE ETAT: " .. stateConfig.message .. " (Duree: " .. stateConfig.duration/1000 .. "s)")
                 TriggerServerEvent('damageSystem:stateChanged', stateName, stateConfig.message)
                 
                 if stateName == "dead" then
                     SetEntityHealth(PlayerPedId(), 0)
                 end
+            else
+                stateEndTime = GetGameTimer() + stateConfig.duration
+                timerPrinted = false
             end
             break
         end
@@ -153,19 +158,9 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(1000)
         
-        if healthState ~= "normal" and healthState ~= "dead" then
-            if GetGameTimer() >= stateEndTime then
-                healthState = "normal"
-                print("ETAT: NORMAL")
-                TriggerServerEvent('damageSystem:stateChanged', "normal", "NORMAL")
-            end
-        end
-        
-        if playerHealth < 100 and healthState == "normal" then
-            playerHealth = playerHealth + 1
-            if playerHealth > 100 then
-                playerHealth = 100
-            end
+        if healthState ~= "normal" and healthState ~= "dead" and stateEndTime > 0 and GetGameTimer() >= stateEndTime and not timerPrinted then
+            timerPrinted = true
+            print("TIMER FINI: Etat final " .. Config.HealthStates[healthState].message)
         end
     end
 end)
@@ -174,4 +169,5 @@ AddEventHandler('playerSpawned', function()
     playerHealth = 100
     healthState = "normal"
     stateEndTime = 0
+    timerPrinted = false
 end)
