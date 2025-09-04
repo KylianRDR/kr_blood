@@ -133,14 +133,15 @@ AddEventHandler('gameEventTriggered', function(name, data)
                 
                 if victim == playerPed then
                     local attackerId = GetPlayerServerId(NetworkGetPlayerIndexFromPed(attacker))
+                    local oldHealth = playerHealth
                     ProcessDamage(damage)
-                    print("VICTIME: " .. damage .. " degats recu de joueur " .. attackerId .. " sur " .. boneName .. " (Vie: " .. playerHealth .. ")")
+                    print("IMPACT: " .. damage .. " degats recu de joueur " .. attackerId .. " sur " .. boneName .. " (Vie: " .. oldHealth .. " -> " .. playerHealth .. ")")
                     TriggerServerEvent('damageSystem:damageReceived', attackerId, GetPlayerServerId(PlayerId()), damage, boneName)
                 end
                 
                 if attacker == playerPed then
                     local victimId = GetPlayerServerId(NetworkGetPlayerIndexFromPed(victim))
-                    print("TIREUR: " .. damage .. " degats inflige a joueur " .. victimId .. " sur " .. boneName)
+                    print("TIR REUSSI: " .. damage .. " degats inflige a joueur " .. victimId .. " sur " .. boneName)
                     TriggerServerEvent('damageSystem:damageDealt', GetPlayerServerId(PlayerId()), victimId, damage, boneName)
                 end
             end
