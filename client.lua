@@ -3,6 +3,16 @@ local lastHitTime = {}
 local healthState = "normal"
 local stateEndTime = 0
 local timerPrinted = false
+local bodyParts = {}
+
+local function InitializeBodyParts()
+    for partName, _ in pairs(Config.BodyParts) do
+        bodyParts[partName] = {
+            health = 100,
+            weapons = {}
+        }
+    end
+end
 
 local function GetBoneZone(boneId)
     for _, headBone in ipairs(Config.BoneZones.head) do
@@ -24,6 +34,17 @@ local function GetBoneZone(boneId)
     end
     
     return "body"
+end
+
+local function GetBodyPartFromBone(boneId)
+    for partName, bones in pairs(Config.BodyParts) do
+        for _, bone in ipairs(bones) do
+            if bone == boneId then
+                return partName
+            end
+        end
+    end
+    return "torse"
 end
 
 local function GetHitBone(victim)
@@ -81,6 +102,32 @@ local function CalculateDamage(weaponHash, boneId)
     end
 end
 
+local function UpdateBodyPartDamage(boneId, damage, weaponHash)
+    local bodyPart = GetBodyPartFromBone(boneId)
+    local weaponName = Config.WeaponNames[weaponHash] or "ARME_INCONNUE"
+    
+    if GetBoneZone(boneId) == "head" then
+        bodyParts[bodyPart].health = 0
+    else
+        bodyParts[bodyPart].health = bodyParts[bodyPart].health - damage
+        if bodyParts[bodyPart].health < 0 then
+            bodyParts[bodyPart].health = 0
+        end
+    end
+    
+    local weaponFound = false
+    for _, weapon in ipairs(bodyParts[bodyPart].weapons) do
+        if weapon == weaponName then
+            weaponFound = true
+            break
+        end
+    end
+    
+    if not weaponFound then
+        table.insert(bodyParts[bodyPart].weapons, weaponName)
+    end
+end
+
 local function UpdateHealthState(damage)
     local totalDamage = 100 - playerHealth
     
@@ -105,14 +152,30 @@ local function UpdateHealthState(damage)
     end
 end
 
-local function ProcessDamage(damage)
+local function ProcessDamage(damage, boneId, weaponHash)
     playerHealth = playerHealth - damage
     if playerHealth < 0 then
         playerHealth = 0
     end
     
+    UpdateBodyPartDamage(boneId, damage, weaponHash)
     UpdateHealthState(damage)
 end
+
+RegisterNetEvent('damageSystem:openMedicalExam')
+AddEventHandler('damageSystem:openMedicalExam', function(targetData)
+    SendNUIMessage({
+        action = 'openMedicalExam',
+        bodyParts = targetData.bodyParts,
+        playerName = targetData.playerName
+    })
+    SetNuiFocus(true, true)
+end)
+
+RegisterNUICallback('closeMedicalExam', function(data, cb)
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
 
 AddEventHandler('gameEventTriggered', function(name, data)
     if name == 'CEventNetworkEntityDamage' then
@@ -139,9 +202,10 @@ AddEventHandler('gameEventTriggered', function(name, data)
                 if victim == playerPed then
                     local attackerId = GetPlayerServerId(NetworkGetPlayerIndexFromPed(attacker))
                     local oldHealth = playerHealth
-                    ProcessDamage(damage)
+                    ProcessDamage(damage, bone, weaponHash)
                     print("IMPACT: " .. damage .. " degats recu de joueur " .. attackerId .. " sur " .. boneName .. " (Vie: " .. oldHealth .. " -> " .. playerHealth .. ")")
                     TriggerServerEvent('damageSystem:damageReceived', attackerId, GetPlayerServerId(PlayerId()), damage, boneName)
+                    TriggerServerEvent('damageSystem:updateBodyParts', bodyParts)
                 end
                 
                 if attacker == playerPed then
@@ -170,4 +234,11 @@ AddEventHandler('playerSpawned', function()
     healthState = "normal"
     stateEndTime = 0
     timerPrinted = false
+    InitializeBodyParts()
+    TriggerServerEvent('damageSystem:updateBodyParts', bodyParts)
+end)
+
+Citizen.CreateThread(function()
+    InitializeBodyParts()
+    TriggerServerEvent('damageSystem:updateBodyParts', bodyParts)
 end)

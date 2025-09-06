@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    overflow: hidden;
+}
+
+.medical-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 1200px;
+    height: 85vh;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-radius: 20px;
+    border: 2px solid #0f3460;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.header {
+    background: linear-gradient(90deg, #e53e3e, #c53030);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    border-bottom: 3px solid #0f3460;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.patient-info {
+    padding: 20px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid #0f3460;
+}
+
+.patient-info h2 {
+    font-size: 20px;
+    color: #4299e1;
+}
+
+.body-container {
+    display: flex;
+    height: calc(100% - 160px);
+    padding: 20px;
+    gap: 30px;
+}
+
+.body-diagram {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid #0f3460;
+    padding: 20px;
+}
+
+.human-body {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+}
+
+.body-part {
+    fill: #48bb78;
+    stroke: #2d3748;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.body-part:hover {
+    stroke: #4299e1;
+    stroke-width: 3;
+    filter: brightness(1.2);
+}
+
+.body-part.damaged {
+    fill: #e53e3e;
+}
+
+.body-part.critical {
+    fill: #742a2a;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.body-info {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.body-part-info {
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #0f3460;
+    transition: all 0.3s ease;
+}
+
+.body-part-info:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #4299e1;
+}
+
+.part-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #4299e1;
+}
+
+.health-bar {
+    position: relative;
+    background: #2d3748;
+    height: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px solid #0f3460;
+}
+
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #48bb78, #38a169);
+    transition: all 0.5s ease;
+    border-radius: 12px;
+}
+
+.health-fill.damaged {
+    background: linear-gradient(90deg, #ed8936, #dd6b20);
+}
+
+.health-fill.critical {
+    background: linear-gradient(90deg, #e53e3e, #c53030);
+}
+
+.health-percent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 12px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.weapons-used {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.weapon-tag {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 10px;
+    font-weight: 500;
+    border: 1px solid #2b6cb0;
+}
+
+.weapon-details {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #0f3460;
+    backdrop-filter: blur(5px);
+}
+
+.weapon-info h3 {
+    margin-bottom: 10px;
+    color: #4299e1;
+    font-size: 14px;
+}
+
+#weaponList {
+    font-size: 12px;
+    color: #a0aec0;
+}
+
+.body-info::-webkit-scrollbar {
+    width: 8px;
+}
+
+.body-info::-webkit-scrollbar-track {
+    background: rgba(45, 55, 72, 0.3);
+    border-radius: 4px;
+}
+
+.body-info::-webkit-scrollbar-thumb {
+    background: #4299e1;
+    border-radius: 4px;
+}
+
+.body-info::-webkit-scrollbar-thumb:hover {
+    background: #3182ce;
+}
